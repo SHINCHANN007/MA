@@ -1,0 +1,17 @@
+# Compute distance matrix
+dist_matrix <- dist(data_scaled)
+
+# Apply Hierarchical Clustering
+hac_result <- hclust(dist_matrix, method = "ward.D2")
+
+# Plot dendrogram
+plot(hac_result)
+
+# Cut tree into clusters (example: 4 clusters)
+hac_clusters <- cutree(hac_result, k = 4)
+
+# Cluster sizes
+table(hac_clusters)
+
+# Visualize clusters
+fviz_cluster(list(data = data_scaled, cluster = hac_clusters))

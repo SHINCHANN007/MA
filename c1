@@ -1,0 +1,52 @@
+# Load required libraries
+library(ggcorrplot)
+library(factoextra)
+
+# Load dataset
+df <- read.csv(file.choose())
+
+# Remove target variable
+df_features <- df[, -which(names(df) == "price_range")]
+
+# Standardize features
+data_scaled <- scale(df_features)
+
+# Apply PCA
+pca_result <- prcomp(data_scaled)
+
+# PCA summary
+summary(pca_result)
+
+# Scree plot
+fviz_eig(pca_result, addlabels = TRUE)
+
+# PCA biplot
+fviz_pca_biplot(pca_result,
+                repel = TRUE,
+                col.var = "blue",
+                col.ind = "gray")
+
+# Determine optimal clusters (Elbow method)
+fviz_nbclust(data_scaled, kmeans, method = "wss")
+
+# Apply K-means clustering
+set.seed(123)
+kmeans_result <- kmeans(data_scaled,
+                        centers = 4,
+                        nstart = 25)
+
+# Cluster sizes
+table(kmeans_result$cluster)
+
+# Cluster visualization
+fviz_cluster(kmeans_result,
+             data = data_scaled,
+             geom = "point",
+             ellipse.type = "convex")
+
+# Cluster summary
+cluster_summary <- aggregate(df_features,
+                             by = list(cluster = kmeans_result$cluster),
+                             FUN = mean)
+
+cluster_summary

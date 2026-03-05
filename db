@@ -1,0 +1,14 @@
+# Install if needed
+install.packages("dbscan")
+
+# Load library
+library(dbscan)
+
+# Apply DBSCAN
+dbscan_result <- dbscan(data_scaled, eps = 0.7, minPts = 5)
+
+# Cluster labels
+table(dbscan_result$cluster)
+
+# Visualize clusters
+fviz_cluster(dbscan_result, data = data_scaled, geom = "point")

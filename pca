@@ -50,3 +50,45 @@ cluster_summary <- aggregate(df_features,
                              FUN = mean)
 
 cluster_summary
+
+
+
+
+
+
+# Install if needed
+install.packages("dbscan")
+
+# Load library
+library(dbscan)
+
+# Apply DBSCAN
+dbscan_result <- dbscan(data_scaled, eps = 0.7, minPts = 5)
+
+# Cluster labels
+table(dbscan_result$cluster)
+
+# Visualize clusters
+fviz_cluster(dbscan_result, data = data_scaled, geom = "point")
+
+
+
+
+
+# Compute distance matrix
+dist_matrix <- dist(data_scaled)
+
+# Apply Hierarchical Clustering
+hac_result <- hclust(dist_matrix, method = "ward.D2")
+
+# Plot dendrogram
+plot(hac_result)
+
+# Cut tree into clusters (example: 4 clusters)
+hac_clusters <- cutree(hac_result, k = 4)
+
+# Cluster sizes
+table(hac_clusters)
+
+# Visualize clusters
+fviz_cluster(list(data = data_scaled, cluster = hac_clusters))

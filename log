@@ -1,0 +1,134 @@
+
+train <- read.csv("C:/Users/anura/Desktop/R/MA datasets/MA datasets/airplane.csv")
+test  <- read.csv("C:/Users/anura/Desktop/R/MA datasets/MA datasets/ap_test.csv")
+
+
+train <- na.omit(train)
+test  <- na.omit(test)
+
+
+train$satisfaction <- factor(train$satisfaction)
+test$satisfaction  <- factor(test$satisfaction)
+
+model <- glm(satisfaction ~ ., data = train, family = binomial)
+
+
+prob <- predict(model, test, type = "response")
+
+
+pred <- ifelse(prob > 0.5, "satisfied", "neutral")
+
+
+mean(pred == test$satisfaction)
+
+
+table(pred, test$satisfaction)
+
+
+library(pROC)
+
+actual <- as.numeric(test$satisfaction) - 1
+roc_obj <- roc(actual, prob)
+plot(roc_obj, main = "ROC Curve")
+
+
+
+hist(prob, main = "Predicted Probabilities", xlab = "Probability")
+
+
+-------------------------
+
+# =====================================
+# LOGISTIC REGRESSION
+# =====================================
+
+# Load data
+train <- read.csv("C:/Users/hp/Desktop/MA datasets/airplane.csv")
+test  <- read.csv("C:/Users/hp/Desktop/MA datasets/ap_test.csv")
+
+# Remove missing values
+train <- na.omit(train)
+test  <- na.omit(test)
+
+# Convert target to factor
+train$satisfaction <- factor(train$satisfaction)
+test$satisfaction  <- factor(test$satisfaction)
+
+# Train model
+model <- glm(satisfaction ~ ., data = train, family = binomial)
+
+# Predict probabilities
+prob <- predict(model, test, type = "response")
+
+# Convert to class
+pred <- ifelse(prob > 0.5, "satisfied", "neutral")
+
+# Accuracy
+mean(pred == test$satisfaction)
+
+# Confusion Matrix
+table(pred, test$satisfaction)
+
+# -------------------------------
+# PLOTS (LOGISTIC)
+# -------------------------------
+
+# 1. ROC Curve
+install.packages("pROC")   # run once
+library(pROC)
+
+actual <- as.numeric(test$satisfaction) - 1
+roc_obj <- roc(actual, prob)
+plot(roc_obj, main = "ROC Curve")
+
+# 2. Histogram of probabilities
+hist(prob, main = "Predicted Probabilities", xlab = "Probability")
+
+# 3. Model diagnostic plots
+par(mfrow = c(2,2))
+plot(model)
+
+
+
+# =====================================
+# FACTOR ANALYSIS
+# =====================================
+
+# Libraries
+install.packages("psych")    # run once
+install.packages("corrplot") # run once
+library(psych)
+library(corrplot)
+
+# Load data
+df <- read.csv("C:/Users/hp/Desktop/MA datasets/airplane.csv")
+
+# Keep only numeric columns
+df_num <- df[, sapply(df, is.numeric)]
+
+# Remove NA
+df_num <- na.omit(df_num)
+
+# Correlation matrix
+cor_mat <- cor(df_num, use = "complete.obs")
+
+# -------------------------------
+# PLOTS (FACTOR ANALYSIS)
+# -------------------------------
+
+# 1. Correlation plot
+corrplot(cor_mat)
+
+# 2. Scree plot (IMPORTANT)
+fa.parallel(df_num, fa = "fa")
+
+# 3. Factor Analysis
+fa_model <- fa(cor_mat, nfactors = 4, rotate = "promax")
+
+# Print result
+print(fa_model)
+
+# 4. Factor diagram (VERY IMPORTANT)
+fa.diagram(fa_model)
+
+

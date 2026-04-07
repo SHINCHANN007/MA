@@ -1,0 +1,47 @@
+library(MASS)
+library(ggplot2)
+library(caret)
+library(psych)
+library(corrplot)
+
+df <- read.csv("C:/Users/anura/Desktop/R/MA datasets/MA datasets/Sales_Product_Details.csv")
+df$Product_Category <- factor(df$Product_Category)
+
+# LDA
+
+lda_model <- lda(Product_Category ~ Quantity + Unit_Price + Sales_Revenue, data=df)
+lda_pred  <- predict(lda_model)
+lda_cm <- confusionMatrix(lda_pred$class, df$Product_Category)
+print(lda_cm)
+
+ggplot(df, aes(Quantity, Sales_Revenue, color=Product_Category)) +
+  geom_point(size=3) + theme_minimal()
+
+# QDA
+
+valid <- names(table(df$Product_Category)[table(df$Product_Category) >= 4])
+df_qda <- droplevels(subset(df, Product_Category %in% valid))
+
+qda_model <- qda(Product_Category ~ Quantity + Unit_Price + Sales_Revenue, data=df_qda)
+qda_pred  <- predict(qda_model)
+qda_cm <- confusionMatrix(qda_pred$class, df_qda$Product_Category)
+print(qda_cm)
+
+ggplot(data.frame(p=qda_pred$posterior[,1], cat=df_qda$Product_Category),
+       aes(p, fill=cat)) +
+  geom_density(alpha=0.5) + theme_minimal()
+
+cat("LDA:", round(lda_cm$overall["Accuracy"],4),
+    " QDA:", round(qda_cm$overall["Accuracy"],4), "\n")
+
+# Factor Analysis
+
+num_data <- scale(df[, c("Quantity","Unit_Price","Sales_Revenue","Latitude","Longitude")])
+
+corrplot(cor(num_data))
+fa.parallel(num_data, fa="fa")
+
+fa_model <- fa(num_data, nfactors=3, rotate="varimax")
+print(fa_model)
+
+fa.diagram(fa_model)

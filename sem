@@ -1,0 +1,104 @@
+# =====================================
+# CONJOINT ANALYSIS (ADD THIS PART)
+# =====================================
+
+#install.packages("conjoint")   # run once
+library(conjoint)
+
+# Load dataset (separate copy)
+data1 <- read.csv("C:/Users/anura/Desktop/apple_quality.csv")
+str(data1)
+# Remove ID
+data1$A_id <- NULL
+
+# Convert numeric → Low/Medium/High
+data1$Size        <- cut(data1$Size, 3, labels = c("Low","Medium","High"))
+data1$Weight      <- cut(data1$Weight, 3, labels = c("Low","Medium","High"))
+data1$Sweetness   <- cut(data1$Sweetness, 3, labels = c("Low","Medium","High"))
+data1$Crunchiness <- cut(data1$Crunchiness, 3, labels = c("Low","Medium","High"))
+data1$Juiciness   <- cut(data1$Juiciness, 3, labels = c("Low","Medium","High"))
+data1$Ripeness    <- cut(data1$Ripeness, 3, labels = c("Low","Medium","High"))
+data1$Acidity     <- cut(as.numeric(data1$Acidity), 3, labels = c("Low","Medium","High"))
+
+# Convert target
+data1$Quality <- as.numeric(as.factor(data1$Quality))
+
+# Model
+conjoint_model <- lm(Quality ~ ., data = data1)
+
+# Output
+summary(conjoint_model)
+
+# -------------------------------
+# PLOTS (CONJOINT)
+# -------------------------------
+
+# 1. Utilities plot
+coef_vals <- coef(conjoint_model)[-1]
+barplot(coef_vals, las = 2, main = "Conjoint Utilities")
+
+# 2. Importance plot
+importance <- abs(coef_vals)
+barplot(importance, las = 2, main = "Attribute Importance")
+
+
+
+# =====================================
+# SEM (YOUR ORIGINAL CODE — SAME)
+# =====================================
+
+#install.packages("lavaan")
+#install.packages("semPlot")
+#install.packages("dplyr")
+
+# load packages
+library(lavaan)
+library(semPlot)
+library(dplyr)
+
+# load dataset
+data <- read.csv("C:/Users/anura/Desktop/apple_quality.csv")
+
+# Remove ID column 
+data$A_id <- NULL
+
+# convert Quality to Numeric 
+data$Quality <- as.numeric(as.factor(data$Quality))
+
+# Convert Acidity to numeric (IMPORTANT FIX)
+data$Acidity <- as.numeric(data$Acidity)
+
+# Path SEM model
+model <- '
+# relationships
+Sweetness ~ Size
+Juiciness ~ Size + Crunchiness
+Acidity ~ Size 
+Quality ~ Size + Sweetness + Juiciness + Acidity
+
+# covariance
+Size ~~ Crunchiness
+'
+
+# Fit model
+fit <- sem(model, data = data)
+
+# Summary
+summary(fit, standardized = TRUE, fit.measures = TRUE)
+
+# PLOT
+semPaths(fit,
+         what="std",
+         layout="tree",
+         style="ram",
+         edge.label.cex=1.2,
+         sizeMan=7,
+         residuals=FALSE,
+         intercepts=FALSE,
+         nCharNodes=0,
+         posCol="darkgreen",
+         negCol="red",
+         edge.width=2,
+         weighted=TRUE,
+         fade=FALSE,
+         rotation=2)

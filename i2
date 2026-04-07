@@ -1,0 +1,253 @@
+Alright—let’s expand this properly, but still in your style: **clear + logical + tied to code (what you did → what it means)**.
+
+---
+
+# **Q1 – Logistic Regression + Factor Analysis**
+
+### **Code Logic**
+
+* You loaded data → converted target to factor
+* Applied logistic regression (`glm`)
+* Generated predictions → confusion matrix
+* Plotted ROC, histogram
+* Then used `fa()` for factor analysis + scree + loadings
+
+### **Interpretation**
+
+Logistic regression gives **~36% accuracy**, so classification is weak.
+From confusion matrix → many wrong predictions → model not fitting well.
+
+But ROC curve is good → meaning:
+
+* Model ranks classes correctly (good discrimination)
+* Problem is **threshold (0.5)** not suitable
+
+Histogram shows probabilities near **0 and 1** → model is confident but still wrong → indicates **poor calibration / imbalance issue**.
+
+---
+
+### **Factor Analysis**
+
+Correlation plot → many variables correlated → FA is valid.
+
+Scree/parallel → suggests **4–7 factors**, you selected **4**.
+
+Loadings show grouping:
+
+* Factor 1 → inflight services
+* Factor 2 → booking/boarding
+* Factor 3 → service handling
+* Factor 4 → delays
+
+Stats:
+
+* Variance ~45% → acceptable
+* RMSR ~0.03 → good fit
+
+👉 **Final:** Logistic fails for prediction, FA succeeds in extracting meaningful service dimensions. 
+
+---
+
+# **Q2 – PCA + Clustering**
+
+### **Code Logic**
+
+* Removed target variable
+* Standardized (`scale()`)
+* Applied PCA (`prcomp`)
+* Visualized → scree + biplot
+* Used silhouette/elbow
+* Applied K-means (`kmeans`)
+* Plotted clusters + dendrogram
+
+---
+
+### **PCA Interpretation**
+
+From summary:
+
+* PC1, PC2, PC3 explain small % each
+* First 5 PCs → ~35–40% variance
+
+Meaning:
+
+* No dominant feature
+* Information spread across many variables
+
+Scree plot → gradual decrease → confirms above
+
+Biplot:
+
+* Same direction → positive correlation
+* Opposite → negative
+* Near origin → less important
+
+---
+
+### **Clustering**
+
+Elbow + silhouette → **k = 4**
+
+K-means result:
+
+* Clusters moderately separated
+* Some overlap → features similar
+
+Hierarchical clustering (Ward) → dendrogram supports multiple clusters
+
+👉 **Final:** PCA reduces dimensions, clustering reveals **4 groups**, but separation not very strong. 
+
+---
+
+# **Q3 – Conjoint Analysis + SEM**
+
+### **Code Logic**
+
+* Used conjoint package → utility estimation
+* Plotted utility + importance
+* Ran regression model
+* SEM → path diagram
+
+---
+
+### **Interpretation**
+
+Utilities:
+
+* High **sweetness, juiciness, weight → positive**
+* Medium/low → reduce preference
+
+Importance:
+
+* Juiciness, sweetness > others
+
+Regression confirms same → significant variables
+
+---
+
+### **SEM**
+
+Relationships:
+
+* Size → increases sweetness, acidity, juiciness
+* Crunchiness → reduces juiciness
+
+Quality:
+
+* Juiciness (+0.37) → strongest
+* Size (+0.28)
+* Acidity (−0.19)
+
+👉 **Final:** Customer preference mainly depends on **juiciness + size**, acidity negatively affects quality. 
+
+---
+
+# **Q4 – Apriori + Regression**
+
+### **Code Logic**
+
+* Used `apriori()` with:
+
+  * support = 0.01
+  * confidence = 0.3
+* Filtered rules (lift > 1)
+* Plotted:
+
+  * item frequency
+  * graph
+  * scatter
+* Ran regression on frequency
+
+---
+
+### **Interpretation**
+
+Item frequency:
+
+* Whole milk, vegetables, buns → most common
+
+Association rules:
+
+* Many rules → low support, moderate confidence
+* Some high lift (>3) → strong rare relations
+
+Graph:
+
+* Whole milk = central item → connects many products
+
+Regression:
+
+* Popularity → positive effect
+* Bakery category → negative vs dairy
+* R² ~0.35 → moderate
+
+👉 **Final:** Few key items dominate and drive cross-selling opportunities. 
+
+---
+
+# **Q5 – LDA, QDA + Factor Analysis**
+
+### **Code Logic**
+
+* Converted category to factor
+* Applied:
+
+  * `lda()`
+  * `qda()`
+* Predicted → confusion matrix
+* Compared accuracy
+* Performed FA + KMO + Bartlett
+
+---
+
+### **Interpretation**
+
+Classification:
+
+* LDA → ~66%
+* QDA → ~73% (better)
+
+Reason:
+
+* QDA handles non-linear boundaries better
+
+Plots:
+
+* Classes overlap → not perfectly separable
+
+---
+
+### **Factor Analysis**
+
+KMO:
+
+* Low (~0.32) → weak sampling adequacy
+
+Bartlett:
+
+* Significant → FA still usable
+
+Factors:
+
+* F1 → Quantity + Revenue
+* F2 → Location
+* F3 → Price
+
+Variance ~89% → very strong explanation
+
+👉 **Final:** QDA better model, sales mainly driven by **quantity + revenue**, but FA reliability slightly limited. 
+
+---
+
+# **Overall One-Line Summary (Exam Ending)**
+
+* Logistic → weak prediction
+* PCA + Clustering → 4 groups identified
+* Conjoint + SEM → preference drivers found
+* Apriori → key product associations
+* QDA > LDA → better classification
+
+---
+
+If you want, I can now convert this into:
+👉 **“write exactly like topper answer sheet (with headings + keywords examiner looks for)”**

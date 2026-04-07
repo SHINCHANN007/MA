@@ -1,0 +1,26 @@
+
+library(arules)
+library(arulesViz)
+library(ggplot2)
+df <- read.csv("C:/Users/anura/Desktop/R/MA datasets/MA datasets/g.csv")
+df$Item.s.=NULL
+
+Groceries<-as(as.list(as.data.frame(t(df))),"transactions")
+rules<-apriori(Groceries,parameter = list(supp=0.01,conf=0.3,minlen=4))
+strong_rules<-subset(rules,lift>1)
+
+itemFrequencyPlot(Groceries,topN=20)
+plot(strong_rules,"scatter")
+plot(strong_rules,method="graph")
+
+itemset<-head(sort(itemFrequency(Groceries,type="absolute"),decreasing = TRUE),20)
+
+top_items<-data.frame(Item=names(itemset),Freq=as.numeric(itemset),
+                      Popularity=ifelse(itemset>=median(itemset),"High","Low"),
+                      Category = c(rep("Dairy",5), rep("Bakery",5), rep("Other",10))
+)
+
+model <- lm(Freq ~ Popularity + Category, data=top_items)
+summary(model)
+
+barplot(coef(model))
